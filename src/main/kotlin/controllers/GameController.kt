@@ -4,6 +4,7 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import domains.Game
+import domains.InputGame
 import services.GameService
 import services.UtilsService
 import spark.Request
@@ -24,14 +25,13 @@ class GameController(){
 
         val gameParams = req.body()
 
-        val mapUser = gsonUs.fromJson(gameParams, HashMap::class.java)
-                .plus(mapOf("id" to newId)) as Map<String, String>
+        val gameRequest = gsonUs.fromJson(gameParams, InputGame::class.java)
 
-        val newGame = gsonUs.fromJson(gsonUs.toJson(mapUser),Game::class.java)
+        val newGame = gameService.createGame(newId, gameRequest)
 
-        println("Game body: ${mapUser}")
-        res.header(constants.RES_HEADER_NAME_CONTENT_TYPE, constants.RES_HEADER_CONTENT_TYPE_APP_JSON)
-        res.status(constants.RES_STATUS_CREATED)
+        println("Game body: ${gameRequest} - Game: ${newGame}")
+        res.header(constants.http.RES_HEADER_NAME_CONTENT_TYPE, constants.http.RES_HEADER_CONTENT_TYPE_APP_JSON)
+        res.status(constants.http.RES_STATUS_CREATED)
 
         """{"status":"created","game_id": "${newId}"}"""
 

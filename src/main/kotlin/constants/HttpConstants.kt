@@ -1,4 +1,4 @@
-package constants
+package constants.http
 
 // HTTP Constants
 // HTTP Status

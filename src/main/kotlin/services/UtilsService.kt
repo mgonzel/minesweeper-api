@@ -26,4 +26,10 @@ public class UtilsService {
 		return sb.toString()
 	}
 
+    fun getRandomInt(max: Int) : Int {
+        val sr = SecureRandom()
+
+        return sr.nextInt(max) + 1
+    }
+
 }

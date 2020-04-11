@@ -23,8 +23,8 @@ class Router : SparkApplication {
 
     fun routes() {
         get("/health") { req : Request , res: Response ->
-            res.status(constants.RES_STATUS_OK)
-            res.header(constants.RES_HEADER_NAME_CONTENT_TYPE, constants.RES_HEADER_CONTENT_TYPE_APP_JSON)
+            res.status(constants.http.RES_STATUS_OK)
+            res.header(constants.http.RES_HEADER_NAME_CONTENT_TYPE, constants.http.RES_HEADER_CONTENT_TYPE_APP_JSON)
             "Server is ON"
         }
         path("/game"){
