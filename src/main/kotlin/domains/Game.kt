@@ -23,14 +23,17 @@ data class Game (
 
         // Personal info
 
-)
+) {
+    val gameKey = "game.${this.id}"
+}
 
 data class Cell (
         val x: Int,
         val y: Int,
         val clicked : Boolean = false,
         val mined: Boolean = false,
-        val flag: Boolean = false
+        val flag: Boolean = false,
+        var adyancents: Int = 0
 ) {
     val cellKey = "${this.x}-${this.y}"
 }

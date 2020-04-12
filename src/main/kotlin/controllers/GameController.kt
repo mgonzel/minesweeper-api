@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder
 import domains.Game
 import domains.InputGame
 import services.GameService
+import services.GsonService
 import services.UtilsService
 import spark.Request
 import spark.Response
@@ -16,16 +17,14 @@ class GameController(){
     val utilsService = UtilsService()
     val gameService = GameService()
 
-    val gsonUs : Gson= GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .create()
+    val gsonService : GsonService = GsonService()
 
     val createGame = { req: Request, res: Response ->
         val newId = utilsService.getRandomName(GAME_NAME_LENGHT).toUpperCase()
 
         val gameParams = req.body()
 
-        val gameRequest = gsonUs.fromJson(gameParams, InputGame::class.java)
+        val gameRequest = gsonService.gson.fromJson(gameParams, InputGame::class.java)
 
         val newGame = gameService.createGame(newId, gameRequest)
 

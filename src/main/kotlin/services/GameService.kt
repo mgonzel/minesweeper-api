@@ -5,7 +5,9 @@ import domains.Game
 import domains.InputGame
 
 class GameService (
-    val utilsService : UtilsService = UtilsService()
+    val utilsService : UtilsService = UtilsService(),
+    val redisService : RedisService = RedisService(),
+    val gsonService : GsonService = GsonService()
 ) {
 
     fun gameStats () : String? {
@@ -43,7 +45,8 @@ class GameService (
 
             initializeMines(game)
         }.let {game : Game ->
-            // saveGame
+            redisService.setValue(game.gameKey, gsonService.gson.toJson(game))
+
             game
         }
         return game

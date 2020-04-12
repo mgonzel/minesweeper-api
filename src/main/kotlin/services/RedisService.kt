@@ -20,6 +20,13 @@ class RedisService (
         }
     }
 
+    fun deleteValue(key: String) {
+        jedisPool.resource.use { jedis ->
+            logger.debug("deleting key: ${key}")
+            jedis.del(key)
+        }
+    }
+
     fun getStatus() : String {
         return try {
             jedisPool.run{
