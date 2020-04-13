@@ -13,7 +13,7 @@ data class InputGame (
 
 data class Game (
         val id: String,
-        private val status: String = "active",
+        private val status: String = constants.game.ACTIVE,
 
         // Config info
         val width : Int = constants.game.DEFAULT_WIDTH,
@@ -48,6 +48,9 @@ data class Game (
     }
     fun isValidCell(cell: Cell) : Boolean {
         return cell.x <= width && cell.y <= height
+    }
+    fun isActive() : Boolean {
+        return constants.game.ACTIVE == this.status
     }
 }
 

@@ -66,12 +66,23 @@ class GameService (
         return game ?: throw NotFoundException( message = "Game not found. Id = ${id}", cause = notCause() )
     }
 
+    private fun getActiveGame(id: String) : Game {
+        val game = getGame(id)
+        if (!game.isActive()){
+            throw BadRequestException(message = "Game is not active any more or has ended", cause = notCause())
+        }
+        return game
+    }
+
     private fun saveOrUpdateGame(game: Game) {
         redisService.setValue(game.gameKey, gsonService.gson.toJson(game))
     }
 
     fun flagCell(gameId: String, inputCell: InputCell, newFlag: Boolean): String {
-        val game = getGame(gameId)
+        val game = getActiveGame(gameId)
+        if (!game.isActive()){
+            throw BadRequestException(message = "Game is not active any more or has ended", cause = notCause())
+        }
         val newCell = inputCell.toCell(flag = newFlag)
         if (!game.isValidCell(newCell)){
             throw BadRequestException(message = "Cell is out of bounds", cause = notCause())

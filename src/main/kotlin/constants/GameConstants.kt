@@ -8,3 +8,7 @@ const val DEFAULT_MINES = 10
 
 const val TRUE = true
 const val FALSE = false
+
+const val ACTIVE = "active"
+const val WINNER = "winner"
+const val LOSER = "loser"

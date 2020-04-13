@@ -54,12 +54,10 @@ class GameController(){
         logger.info ( "Input Cell selected for flag: ${inputCell}")
 
         gameService.flagCell(gameId, inputCell, newFlag)
-        //val game = gameService.getGame(gameId)
 
-
-
-
-        //game.toString()
+        res.header(constants.http.HEADER_NAME_CACHE_CONTROL,constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+        res.status(constants.http.RES_STATUS_OK)
+        """{"status":"OK", "message":"updated"}"""
     }
 
 }
