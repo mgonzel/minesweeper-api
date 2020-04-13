@@ -48,22 +48,18 @@ class GameController(){
 
     }
 
-    val addFlag = { req: Request, res: Response ->
+    val setFlag = { req: Request, res: Response, newFlag: Boolean ->
         val gameId = req.params("gameId")
         val inputCell = gsonService.gson.fromJson(req.body(), InputCell::class.java).validate()
         logger.info ( "Input Cell selected for flag: ${inputCell}")
 
-        gameService.flagCell(gameId, inputCell, constants.game.TRUE)
+        gameService.flagCell(gameId, inputCell, newFlag)
         //val game = gameService.getGame(gameId)
 
 
 
 
         //game.toString()
-    }
-
-    val removeFlag = { req: Request, res: Response ->
-
     }
 
 }

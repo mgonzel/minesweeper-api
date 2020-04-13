@@ -49,7 +49,7 @@ class GameService (
 
             initializeMines(game)
         }.let {game : Game ->
-            redisService.setValue(game.gameKey, gsonService.gson.toJson(game))
+            saveOrUpdateGame(game)
 
             game
         }
@@ -66,13 +66,13 @@ class GameService (
         return game ?: throw NotFoundException( message = "Game not found. Id = ${id}", cause = notCause() )
     }
 
-    fun updateGame() {
-
+    private fun saveOrUpdateGame(game: Game) {
+        redisService.setValue(game.gameKey, gsonService.gson.toJson(game))
     }
 
     fun flagCell(gameId: String, inputCell: InputCell, newFlag: Boolean): String {
         val game = getGame(gameId)
-        val newCell = inputCell.toCell(flag = constants.game.TRUE)
+        val newCell = inputCell.toCell(flag = newFlag)
         if (!game.isValidCell(newCell)){
             throw BadRequestException(message = "Cell is out of bounds", cause = notCause())
         }
@@ -83,10 +83,12 @@ class GameService (
             } else {
                 val updatedCell = actualCell.changeFlag(newFlag)
                 game.setCell(updatedCell)
+                saveOrUpdateGame(game)
                 return gsonService.gson.toJson(updatedCell)
             }
         } else {
             game.setCell(newCell)
+            saveOrUpdateGame(game)
             return gsonService.gson.toJson(newCell)
         }
     }

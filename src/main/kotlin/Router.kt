@@ -34,8 +34,12 @@ class Router : SparkApplication {
             post("", gameController.createGame)
             get("/:gameId", gameController.getGameStats)
             post("/:gameId/press", gameController.press)
-            post("/:gameId/flag", gameController.addFlag)
-            delete("/:gameId/flag", gameController.removeFlag)
+            post("/:gameId/flag", { req: Request, res: Response ->
+                gameController.setFlag(req, res, constants.game.TRUE) }
+            )
+            delete("/:gameId/flag", { req: Request, res: Response ->
+                gameController.setFlag(req, res, constants.game.FALSE) }
+            )
         }
 
         // Error control
