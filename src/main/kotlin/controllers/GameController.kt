@@ -4,6 +4,7 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import domains.Game
+import domains.InputCell
 import domains.InputGame
 import services.GameService
 import services.GsonService
@@ -12,6 +13,9 @@ import spark.Request
 import spark.Response
 
 private const val GAME_NAME_LENGHT: Int = 5
+
+private val logger = mu.KotlinLogging.logger {}
+
 
 class GameController(){
     val utilsService = UtilsService()
@@ -29,7 +33,7 @@ class GameController(){
         val newGame = gameService.createGame(newId, gameRequest)
 
         println("Game body: ${gameRequest} - Game: ${newGame}")
-        res.header(constants.http.RES_HEADER_NAME_CONTENT_TYPE, constants.http.RES_HEADER_CONTENT_TYPE_APP_JSON)
+        res.header(constants.http.HEADER_NAME_CONTENT_TYPE, constants.http.HEADER_CONTENT_TYPE_APP_JSON)
         res.status(constants.http.RES_STATUS_CREATED)
 
         """{"status":"created","game_id": "${newId}"}"""
@@ -45,7 +49,17 @@ class GameController(){
     }
 
     val addFlag = { req: Request, res: Response ->
+        val gameId = req.params("gameId")
+        val inputCell = gsonService.gson.fromJson(req.body(), InputCell::class.java).validate()
+        logger.info ( "Input Cell selected for flag: ${inputCell}")
 
+        gameService.flagCell(gameId, inputCell, constants.game.TRUE)
+        //val game = gameService.getGame(gameId)
+
+
+
+
+        //game.toString()
     }
 
     val removeFlag = { req: Request, res: Response ->

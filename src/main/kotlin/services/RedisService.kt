@@ -50,7 +50,7 @@ class RedisService (
         }
     }
 
-    private fun getValue(key : String) : String? {
+    fun getValue(key : String) : String? {
         jedisPool.resource.use { jedis ->
             return jedis.get(key)
         }

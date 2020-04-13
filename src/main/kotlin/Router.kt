@@ -3,10 +3,13 @@ import spark.Response
 import spark.Spark.*
 import spark.servlet.SparkApplication
 import controllers.*
+import exceptions.HttpException
 
-val gameController = GameController()
+private val logger = mu.KotlinLogging.logger {}
 
 class Router : SparkApplication {
+    val gameController = GameController()
+
     override fun init() {
         port(8080)
 
@@ -24,7 +27,7 @@ class Router : SparkApplication {
     fun routes() {
         get("/health") { req : Request , res: Response ->
             res.status(constants.http.RES_STATUS_OK)
-            res.header(constants.http.RES_HEADER_NAME_CONTENT_TYPE, constants.http.RES_HEADER_CONTENT_TYPE_APP_JSON)
+            res.header(constants.http.HEADER_NAME_CONTENT_TYPE, constants.http.HEADER_CONTENT_TYPE_APP_JSON)
             "Server is ON"
         }
         path("/game"){
@@ -34,5 +37,35 @@ class Router : SparkApplication {
             post("/:gameId/flag", gameController.addFlag)
             delete("/:gameId/flag", gameController.removeFlag)
         }
+
+        // Error control
+        notFound({_, res ->
+            logger.info ("Exception: NOT_FOUND")
+            res.type("application/json");
+            res.status (constants.http.RES_STATUS_NOT_FOUND)
+            res.header(constants.http.HEADER_NAME_CACHE_CONTROL, constants.http.HEADER_NOT_FOUND_CACHE) //
+            "{\"message\":\"The resource you requested was not found\"}";
+        });
+        internalServerError({_, res ->
+            logger.info ("Exception: INTERNAL_ERROR")
+            res.type(constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+            res.status (constants.http.RES_STATUS_INTERNAL_ERROR)
+            "{\"message\":\"An Internal Server Error has ocurred (500).\"}";
+        });
+        exception (Exception::class.java, { e, _, res ->
+            logger.info ("Exception: GENERIC EXCEPTION", e)
+            res.type(constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+            res.status (constants.http.RES_STATUS_INTERNAL_ERROR)
+            res.body("{\"message\":\"Hubo una excepcion debido a una acción inesperada\"}");
+            //NewRelic.noticeError(e)
+
+        })
+        exception (HttpException::class.java, { e, _, res ->
+            logger.info ("Exception: HTTP_EXCEPTION", e)
+            res.type(constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+            res.status (e.status)
+            res.body("{\"message\":\"${e.message}\"}");
+            //NewRelic.noticeError(e)
+        })
     }
 }
