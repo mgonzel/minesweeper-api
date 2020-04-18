@@ -41,11 +41,23 @@ class GameController(){
     }
 
     val getGameStats = { req: Request, res: Response ->
-        gameService.gameStats()
+        val gameStats = gameService.gameStats( req.params("gameId") )
+
+        res.header(constants.http.HEADER_NAME_CACHE_CONTROL,constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+        res.status(constants.http.RES_STATUS_OK)
+        gameStats
     }
 
     val press = { req: Request, res: Response ->
+        val gameId = req.params("gameId")
+        val inputCell = gsonService.gson.fromJson(req.body(), InputCell::class.java).validate()
+        logger.info ( "Input Cell selected for click: ${inputCell}")
 
+        val result = gameService.pressCell(gameId,inputCell)
+
+        res.header(constants.http.HEADER_NAME_CACHE_CONTROL,constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+        res.status(constants.http.RES_STATUS_OK)
+        result
     }
 
     val setFlag = { req: Request, res: Response, newFlag: Boolean ->

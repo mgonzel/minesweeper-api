@@ -1,6 +1,5 @@
 package domains
 
-import com.google.gson.annotations.SerializedName
 import exceptions.BadRequestException
 import exceptions.notCause
 
@@ -13,7 +12,7 @@ data class InputGame (
 
 data class Game (
         val id: String,
-        private val status: String = constants.game.ACTIVE,
+        private var status: String = constants.game.ACTIVE,
 
         // Config info
         val width : Int = constants.game.DEFAULT_WIDTH,
@@ -52,6 +51,35 @@ data class Game (
     fun isActive() : Boolean {
         return constants.game.ACTIVE == this.status
     }
+    fun lost () {
+        this.status = constants.game.LOSER
+    }
+    fun getAdjacency(cell: Cell) : Int {
+        val left = if (cell.x > 1) { cell.x -1 } else { 1 }
+        val right = if (cell.x < this.width) { cell.x + 1 } else { this.width }
+        val top = if (cell.y > 1) { cell.y -1 } else { 1 }
+        val bottom = if (cell.y < this.height) { cell.x +1 } else { this.height }
+
+        println("Revisar adyacentes en x=[${left}-${right}]; y=[${top}-${bottom}]")
+        var adjacents : Int = 0
+        for (x in left..right) {
+            for (y in top..bottom){
+                if (x != cell.x || y != cell.y){
+                    val adjacentCell = getCell(Cell.getCellKey(x, y))
+                    println("Buscando celda ${Cell.getCellKey(x,y)}... = ${adjacentCell} ")
+                    if (adjacentCell != null){
+                        println ("Celda encontrada: ${adjacentCell}")
+                    }
+                    if (adjacentCell!=null && adjacentCell.mined){
+                        "Celda minada encontrada: ${adjacentCell.cellKey}. Sumando"
+                        adjacents ++
+                    }
+                }
+            }
+        }
+
+        return adjacents
+    }
 }
 
 data class Cell (
@@ -60,7 +88,7 @@ data class Cell (
         val clicked : Boolean = constants.game.FALSE,
         val mined: Boolean = constants.game.FALSE,
         val flag: Boolean = constants.game.FALSE,
-        var adyacents: Int = 0
+        var adjacents: Int = 0
 ) {
     val cellKey = getCellKey(this.x, this.y)
 
@@ -75,7 +103,17 @@ data class Cell (
                 y = this.y,
                 mined = this.mined,
                 flag = newFlag,
-                adyacents = this.adyacents)
+                adjacents = this.adjacents)
+    }
+    fun click () : Cell {
+        val cell = Cell(x = this.x,
+                y = this.y,
+                mined = this.mined,
+                flag = this.flag,
+                clicked = constants.game.TRUE,
+                adjacents = this.adjacents)
+
+        return cell
     }
 }
 
@@ -97,7 +135,7 @@ data class InputCell (
         return Cell(x = this.x, y = this.y,
                 clicked = clicked,
                 flag = flag,
-                adyacents = adyancents,
+                adjacents = adyancents,
                 mined = constants.game.FALSE)
     }
 }
