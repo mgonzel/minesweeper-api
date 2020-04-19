@@ -39,7 +39,7 @@ class Router : SparkApplication {
         get("/health") { req : Request , res: Response ->
             res.status(constants.http.RES_STATUS_OK)
             res.header(constants.http.HEADER_NAME_CONTENT_TYPE, constants.http.HEADER_CONTENT_TYPE_APP_JSON)
-            "Server is ON"
+            """{"status": "${constants.game.OK}, "message": "Server is ON"}"""
         }
         path("/game"){
             post("", gameController.createGame)
