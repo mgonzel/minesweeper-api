@@ -4,6 +4,7 @@ import domains.*
 import exceptions.BadRequestException
 import exceptions.NotFoundException
 import exceptions.notCause
+import java.util.*
 
 class GameService (
     val utilsService : UtilsService = UtilsService(),
@@ -136,7 +137,7 @@ class GameService (
 
         if (clickedCell.adjacents == 0){
             val adjacentsToClick = mutableMapOf<String, Cell>()
-            findAdjacentsWithNoAdjacency(game, clickedCell, adjacentsToClick)
+            findAdjacentsWithNoAdjacencyNonRecursive(game, clickedCell, adjacentsToClick)
 
             adjacentsToClick.forEach { cellKey, cellToClick ->
                 val clicked = cellToClick.click()
@@ -157,6 +158,27 @@ class GameService (
         ))
     }
 
+    fun findAdjacentsWithNoAdjacencyNonRecursive(game: Game, cell: Cell, foundCells: MutableMap<String, Cell>) {
+        val stack : Stack<Cell> = Stack()
+        stack.push (cell)
+
+        while (!stack.isEmpty()) {
+            val currentCell = stack.pop()
+            foundCells.put(currentCell.cellKey, currentCell)
+            if (currentCell.adjacents == 0) {
+                game.getAdjacentCells(currentCell).forEach { cellKey, adjCell ->
+                    if (!foundCells.containsKey(cellKey)) {
+                        if (!adjCell.clicked) {
+                            adjCell.adjacents = game.getAdjacency(adjCell)
+                            stack.push(adjCell)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Deprecated(message="Nice recursive solution but gives stack overflow on big and very empty maps")
     fun findAdjacentsWithNoAdjacency(game: Game, cell: Cell, foundCells: MutableMap<String, Cell>) {
         game.getAdjacentCells(cell).forEach { cellKey, adjCell ->
             if (!foundCells.containsKey(cellKey)){
