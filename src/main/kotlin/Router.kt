@@ -10,8 +10,19 @@ private val logger = mu.KotlinLogging.logger {}
 class Router : SparkApplication {
     val gameController = GameController()
 
+    fun getHerokuAssignedPort() : Int {
+        val processBuilder = ProcessBuilder()
+        try {
+            if (processBuilder.environment().get("PORT") != null) {
+                return Integer.parseInt(processBuilder.environment().get("PORT"));
+            }
+        } catch (e: Exception) {
+            logger.error ("Error trying to get port from Heroku")
+        }
+        return 8080; //return default port if heroku-port isn't set (i.e. on localhost)
+    }
     override fun init() {
-        port(8080)
+        port(getHerokuAssignedPort())
 
         routes()
 
