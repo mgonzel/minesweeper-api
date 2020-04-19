@@ -1,6 +1,6 @@
 # minesweeper-API
 
-Minesweeper game backend API for Deviget Code Test. [Instructions](CHALLENGE.md)
+Minesweeper game backend API for Deviget Code Test. [Instructions](Challenge.md)
 
 ## LocalRunning
 
