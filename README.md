@@ -125,10 +125,10 @@ if game is won, it will return all the map, including mined cells
 ```
 {
 	"code": "ok",
-	"message": "Clicked on a mine, game lost",
+	"message": "Clic accepted, game updated",
 	"game": {
 		"id": "DMDP5",
-		"status": "loser",
+		"status": "winner",
 		"game_map": {
 			"2-3": {
 				"cell_key": "2-3",
@@ -205,11 +205,67 @@ if game is lost, it will return all the map, including mined cells
 }
 ```
 
+Checks and errors
+Pressing a cell will fail if:
+- Game is not active (winner or looser cases) - (400 - Bad request)
+- Cell is out of range (also applies to flag) - (400 - Bad request)
+- Cell is already clicked - (400 - Bad request)
+- Game is not found (also applies for flag and game status) - (404 - Not found)
+
+#### Game status (for debug)
+It will return the game status, including full-map with clicked, flagged and mined cells
+
+`GET /game/:gameId`
+
+Response
+```
+{
+  "game_key": "game.FT98G",
+  "id": "FT98G",
+  "status": "active",
+  "width": 5,
+  "height": 5,
+  "mines": 5,
+  "game_map": {
+    "4-2": {
+      "cell_key": "4-2",
+      "x": 4,
+      "y": 2,
+      "clicked": false,
+      "mined": true,
+      "flag": false,
+      "adjacents": 0
+    },
+    ...
+    "2-4": {
+      "cell_key": "2-4",
+      "x": 2,
+      "y": 4,
+      "clicked": false,
+      "mined": true,
+      "flag": true,
+      "adjacents": 0
+    },
+    "2-1": {
+      "cell_key": "2-1",
+      "x": 2,
+      "y": 1,
+      "clicked": true,
+      "mined": false,
+      "flag": false,
+      "adjacents": 0
+    }
+  },
+  "click_count": 1
+}
+```
+
+
 ## Public site
 
 
 ### TODO
 
-- Swagger
+- Swagger (although you can read this documentation)
 - Automatic tests (unit or functional)
 
