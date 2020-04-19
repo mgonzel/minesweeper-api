@@ -4,7 +4,7 @@ Minesweeper game backend API for Deviget Code Test. [Instructions](CHALLENGE.md)
 
 ## LocalRunning
 
-#### With gradle (Redis is required)
+#### With gradle (Redis is required - set REDIS_CLI with redis URL / host)
 
 `gradle run`
 
