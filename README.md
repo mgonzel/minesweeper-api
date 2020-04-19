@@ -40,6 +40,171 @@ Body (all parameters are optional)
 }
 ```
 
+Response
+```{"status":"created","game_id": "0C899"}```
+
+#### Flag a cell
+
+`POST /game/:gameId/flag`
+
+Headers
+- Content-type: application/json
+
+Body (all parameters are required)
+```
+{
+    "x" : 5,  // from left (1) to right (width)
+    "y" : 5,  // from top (1) to bottom (height)
+}
+```
+
+Response
+```{"status":"OK", "message":"updated"}```
+
+### Unflag a cell
+
+`DELETE /game/:gameId/flag`
+
+Body, responses and checks are the same as "flag"
+
+#### Press a cell
+When you press a cell, some checks are validated
+- if there is not an adjacent mined cell, automatically clicks the adjacents, recursively
+- automatically end games if win or loose
+- response size may vary according to game status ('active', 'winner' or 'looser') but they will have the same json structure
+
+`POST /game/:gameId/press`
+
+Headers
+- Content-type: application/json
+
+Body (all parameters are required)
+```
+{
+    "x" : 5,  // from left (1) to right (width)
+    "y" : 5,  // from top (1) to bottom (height)
+}
+```
+
+Responses
+If game is still active, it will return the list of modified cells, according to the adjacence rule
+```
+{
+	code": "ok",
+	"message": "Clic accepted, game updated",
+	"game": {
+		"id": "DMDP5",
+		"status": "active",
+		"game_map": {
+			"5-5": {
+				"cell_key": "5-5",
+				"x": 5,
+				"y": 5,
+				"clicked": true,
+				"mined": false,
+				"flag": false,
+				"adjacents": 0
+			},
+            ...
+			},
+			"5-3": {
+				"cell_key": "5-3",
+				"x": 5,
+				"y": 3,
+				"clicked": true,
+				"mined": false,
+				"flag": false,
+				"adjacents": 0
+			}
+		}
+	}
+}
+```
+
+if game is won, it will return all the map, including mined cells
+```
+{
+	"code": "ok",
+	"message": "Clicked on a mine, game lost",
+	"game": {
+		"id": "DMDP5",
+		"status": "loser",
+		"game_map": {
+			"2-3": {
+				"cell_key": "2-3",
+				"x": 2,
+				"y": 3,
+				"clicked": true,
+				"mined": false,
+				"flag": false,
+				"adjacents": 0
+			},
+			"1-2": {
+				"cell_key": "1-2",
+				"x": 1,
+				"y": 2,
+				"clicked": false,
+				"mined": true,
+				"flag": false,
+				"adjacents": 0
+			},
+            ...
+			"5-3": {
+				"cell_key": "5-3",
+				"x": 5,
+				"y": 3,
+				"clicked": true,
+				"mined": false,
+				"flag": false,
+				"adjacents": 0
+			}
+		}
+	}
+}
+```
+
+if game is lost, it will return all the map, including mined cells
+```
+{
+	"code": "ok",
+	"message": "Clicked on a mine, game lost",
+	"game": {
+		"id": "DMDP5",
+		"status": "loser",
+		"game_map": {
+			"2-3": {
+				"cell_key": "2-3",
+				"x": 2,
+				"y": 3,
+				"clicked": true,
+				"mined": true,
+				"flag": false,
+				"adjacents": 0
+			},
+			"1-2": {
+				"cell_key": "1-2",
+				"x": 1,
+				"y": 2,
+				"clicked": false,
+				"mined": true,
+				"flag": false,
+				"adjacents": 0
+			},
+            ...
+			"5-3": {
+				"cell_key": "5-3",
+				"x": 5,
+				"y": 3,
+				"clicked": true,
+				"mined": false,
+				"flag": false,
+				"adjacents": 0
+			}
+		}
+	}
+}
+```
+
 ## Public site
 
 

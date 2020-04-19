@@ -41,7 +41,7 @@ class GameController(){
     val getGameStats = { req: Request, res: Response ->
         val gameStats = gameService.gameStats( req.params("gameId") )
 
-        res.header(constants.http.HEADER_NAME_CONTENT_TYPE,constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+        res.header(constants.http.HEADER_NAME_CONTENT_TYPE, constants.http.HEADER_CONTENT_TYPE_APP_JSON)
         res.status(constants.http.RES_STATUS_OK)
         gameStats
     }
@@ -53,7 +53,7 @@ class GameController(){
 
         val result = gameService.pressCell(gameId,inputCell)
 
-        res.header(constants.http.HEADER_NAME_CACHE_CONTROL,constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+        res.header(constants.http.HEADER_NAME_CONTENT_TYPE, constants.http.HEADER_CONTENT_TYPE_APP_JSON)
         res.status(constants.http.RES_STATUS_OK)
         result
     }
@@ -65,7 +65,7 @@ class GameController(){
 
         gameService.flagCell(gameId, inputCell, newFlag)
 
-        res.header(constants.http.HEADER_NAME_CACHE_CONTROL,constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+        res.header(constants.http.HEADER_NAME_CONTENT_TYPE, constants.http.HEADER_CONTENT_TYPE_APP_JSON)
         res.status(constants.http.RES_STATUS_OK)
         """{"status":"OK", "message":"updated"}"""
     }
