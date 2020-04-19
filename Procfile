@@ -1,1 +1,1 @@
-web: build/install/kotlinserver/bin/kotlinserver
+web: java -jar build/libs/Minesweeper\ API-1.0-SNAPSHOT.jar
