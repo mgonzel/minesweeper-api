@@ -262,7 +262,7 @@ Response
 
 
 ## Public site
-
+#### https://mgonzel-minesweeper.herokuapp.com/health (app health, use root for API URIs)
 
 ### TODO
 
