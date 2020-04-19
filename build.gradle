@@ -68,6 +68,7 @@ jar {
                 'Main-Class': 'MainAppKt'
         )
     }
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 task stage {
