@@ -20,9 +20,8 @@ data class Game (
         val mines : Int = constants.game.DEFAULT_MINES,
 
         // Game info
-        val gameMap : MutableMap<String, Cell> = mutableMapOf()
-
-        // Personal info
+        val gameMap : MutableMap<String, Cell> = mutableMapOf(),
+        var clickCount : Int = 0
 
 ) {
     val gameKey = getGameKey(this.id)
@@ -37,6 +36,12 @@ data class Game (
         return gameMap.containsKey(cell.cellKey)
     }
     fun setCell(cell: Cell) {
+        if (cell.clicked) {
+            val actualCell = gameMap.get(cell.cellKey)
+            if (actualCell == null || !actualCell.clicked) {
+                this.clickCount++
+            }
+        }
         gameMap.put(cell.cellKey, cell)
     }
     fun getCell(cell: Cell) : Cell? {
@@ -54,24 +59,23 @@ data class Game (
     fun lost () {
         this.status = constants.game.LOSER
     }
+    fun getStatus() : String {
+        return this.status
+    }
+
     fun getAdjacency(cell: Cell) : Int {
         val left = if (cell.x > 1) { cell.x -1 } else { 1 }
         val right = if (cell.x < this.width) { cell.x + 1 } else { this.width }
         val top = if (cell.y > 1) { cell.y -1 } else { 1 }
-        val bottom = if (cell.y < this.height) { cell.x +1 } else { this.height }
+        val bottom = if (cell.y < this.height) { cell.y +1 } else { this.height }
 
-        println("Revisar adyacentes en x=[${left}-${right}]; y=[${top}-${bottom}]")
         var adjacents : Int = 0
         for (x in left..right) {
             for (y in top..bottom){
                 if (x != cell.x || y != cell.y){
                     val adjacentCell = getCell(Cell.getCellKey(x, y))
-                    println("Buscando celda ${Cell.getCellKey(x,y)}... = ${adjacentCell} ")
-                    if (adjacentCell != null){
-                        println ("Celda encontrada: ${adjacentCell}")
-                    }
+
                     if (adjacentCell!=null && adjacentCell.mined){
-                        "Celda minada encontrada: ${adjacentCell.cellKey}. Sumando"
                         adjacents ++
                     }
                 }
@@ -79,6 +83,40 @@ data class Game (
         }
 
         return adjacents
+    }
+    fun getAdjacentCells (cell: Cell) : MutableMap<String, Cell> {
+        val left = if (cell.x > 1) { cell.x -1 } else { 1 }
+        val right = if (cell.x < this.width) { cell.x + 1 } else { this.width }
+        val top = if (cell.y > 1) { cell.y -1 } else { 1 }
+        val bottom = if (cell.y < this.height) { cell.y +1 } else { this.height }
+
+        val adjacents = mutableMapOf<String, Cell>()
+        for (x in left..right) {
+            for (y in top..bottom){
+                if (x != cell.x || y != cell.y){
+                    val adjacentKey = Cell.getCellKey(x, y)
+                    val adjacentCell = getCell(adjacentKey)
+
+                    if (adjacentCell!=null){
+                        adjacents.put(adjacentCell.cellKey, adjacentCell)
+                    } else {
+                        adjacents.put(adjacentKey, Cell(x, y))
+                    }
+                }
+            }
+        }
+
+        return adjacents
+
+    }
+
+    fun checkAndUpdateStatus() {
+        val totalCells = this.clickCount + this.mines
+        val matrixSize : Int = this.height * this.width
+
+        if (totalCells >= matrixSize){
+            this.status = constants.game.WINNER
+        }
     }
 }
 
@@ -139,3 +177,14 @@ data class InputCell (
                 mined = constants.game.FALSE)
     }
 }
+
+data class GameResponse(
+        val code : String,
+        val message : String,
+        val game : GameStatus
+)
+data class GameStatus (
+        val id : String,
+        val status : String,
+        val gameMap : Map<String, Cell>?
+)

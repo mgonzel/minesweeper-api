@@ -27,12 +27,10 @@ class GameController(){
         val newId = utilsService.getRandomName(GAME_NAME_LENGHT).toUpperCase()
 
         val gameParams = req.body()
-
         val gameRequest = gsonService.gson.fromJson(gameParams, InputGame::class.java)
 
         val newGame = gameService.createGame(newId, gameRequest)
 
-        println("Game body: ${gameRequest} - Game: ${newGame}")
         res.header(constants.http.HEADER_NAME_CONTENT_TYPE, constants.http.HEADER_CONTENT_TYPE_APP_JSON)
         res.status(constants.http.RES_STATUS_CREATED)
 
@@ -43,7 +41,7 @@ class GameController(){
     val getGameStats = { req: Request, res: Response ->
         val gameStats = gameService.gameStats( req.params("gameId") )
 
-        res.header(constants.http.HEADER_NAME_CACHE_CONTROL,constants.http.HEADER_CONTENT_TYPE_APP_JSON)
+        res.header(constants.http.HEADER_NAME_CONTENT_TYPE,constants.http.HEADER_CONTENT_TYPE_APP_JSON)
         res.status(constants.http.RES_STATUS_OK)
         gameStats
     }

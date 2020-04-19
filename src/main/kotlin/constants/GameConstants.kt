@@ -12,3 +12,6 @@ const val FALSE = false
 const val ACTIVE = "active"
 const val WINNER = "winner"
 const val LOSER = "loser"
+
+const val OK = "ok"
+const val ERROR = "error"

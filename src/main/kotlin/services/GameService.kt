@@ -1,9 +1,6 @@
 package services
 
-import domains.Cell
-import domains.Game
-import domains.InputCell
-import domains.InputGame
+import domains.*
 import exceptions.BadRequestException
 import exceptions.NotFoundException
 import exceptions.notCause
@@ -15,7 +12,7 @@ class GameService (
 ) {
 
     fun gameStats (gameId: String) : String? {
-        val game = getActiveGame(gameId)
+        val game = getGame(gameId)
         return gsonService.gson.toJson(game)
     }
 
@@ -106,6 +103,9 @@ class GameService (
         val game = getActiveGame(gameId)
 
         val newCell = inputCell.toCell(clicked = constants.game.TRUE)
+        if (!game.isValidCell(newCell)){
+            throw BadRequestException(message = "Cell is out of bounds", cause = notCause())
+        }
 
         val gameHasCell = game.contains(newCell)
 
@@ -119,14 +119,56 @@ class GameService (
             game.lost()
             saveOrUpdateGame(game)
 
-            return gsonService.gson.toJson(clickedCell)
-        } else {
-            val clickedCell = workingCell.click()
-            clickedCell.adjacents = game.getAdjacency(clickedCell)
-
-            game.setCell(clickedCell)
-            // saveOrUpdateGame(game)
-            return gsonService.gson.toJson(clickedCell)
+            return gsonService.gson.toJson(GameResponse(
+                    code = constants.game.OK,
+                    message = "Clicked on a mine, game lost",
+                    game = GameStatus(id = game.id, status = game.getStatus(), gameMap = game.gameMap)
+            ))
         }
+
+        val clickedCell = workingCell.click()
+        clickedCell.adjacents = game.getAdjacency(clickedCell)
+
+        game.setCell(clickedCell)
+        //saveOrUpdateGame(game)
+        val listModified = mutableMapOf<String, Cell>()
+        listModified.put(clickedCell.cellKey, clickedCell)
+
+        if (clickedCell.adjacents == 0){
+            val adjacentsToClick = mutableMapOf<String, Cell>()
+            findAdjacentsWithNoAdjacency(game, clickedCell, adjacentsToClick)
+
+            adjacentsToClick.forEach { cellKey, cellToClick ->
+                val clicked = cellToClick.click()
+                game.setCell(clicked)
+                listModified.put(clicked.cellKey, clicked)
+            }
+        }
+        game.checkAndUpdateStatus()
+        saveOrUpdateGame(game)
+
+        return gsonService.gson.toJson(GameResponse(
+                code = constants.game.OK,
+                message = "Clic accepted, game updated",
+                game = GameStatus(id = game.id,
+                        status = game.getStatus(),
+                        gameMap = if (game.getStatus() == constants.game.WINNER) { game.gameMap } else { listModified }
+                )
+        ))
+    }
+
+    fun findAdjacentsWithNoAdjacency(game: Game, cell: Cell, foundCells: MutableMap<String, Cell>) {
+        game.getAdjacentCells(cell).forEach { cellKey, adjCell ->
+            if (!foundCells.containsKey(cellKey)){
+                if (!adjCell.clicked) {
+                    adjCell.adjacents = game.getAdjacency(adjCell)
+                    foundCells.put(cellKey, adjCell)
+                    if (adjCell.adjacents == 0){
+                        findAdjacentsWithNoAdjacency(game, adjCell, foundCells)
+                    }
+                }
+            }
+        }
+
     }
 }
