@@ -62,6 +62,14 @@ buildscript {
     }
 }
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'MainAppKt'
+        )
+    }
+}
+
 task stage {
     dependsOn installDist
 }
