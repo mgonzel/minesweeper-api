@@ -24,6 +24,10 @@ Start up Minesweeper-API with Gradle under Docker
 
 ## API documentation
 
+### Swagger
+
+`https://app.swaggerhub.com/apis-docs/mgonzel/mgonzel-minesweeper/1.0.0`
+
 #### Create a new game
 
 `POST /game`
@@ -266,6 +270,5 @@ Response
 
 ### TODO
 
-- Swagger (although you can read this documentation)
 - Automatic tests (unit or functional)
 
